@@ -1,0 +1,125 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    volumes:
+      - db_data_2:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    networks:
+      - task_management_network
+
+  django:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    container_name: django
+    restart: always
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - task_management_network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - db_data_2:/data
+    command: redis-server --appendonly yes
+    env_file:
+      - .env
+    networks:
+      - task_management_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbit
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    env_file:
+      - .env
+    networks:
+      - task_management_network
+
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A config worker --loglevel=info
+    container_name: celery-worker
+    restart: always
+    volumes:
+      - db_data_2:/celery/worker
+    env_file:
+      - .env
+    depends_on:
+      - django
+      - rabbitmq
+    networks:
+      - task_management_network
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A config beat --loglevel=info
+    container_name: celery-beat
+    restart: always
+    volumes:
+      - db_data_2:/celery/beat
+    env_file:
+      - .env
+    depends_on:
+      - django
+      - rabbitmq
+    networks:
+      - task_management_network
+
+  flower:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A config flower
+    container_name: flower
+    restart: always
+    volumes:
+      - db_data_2:/flower
+    ports:
+      - '5555:5555'
+    env_file:
+      - .env
+    depends_on:
+      - celery-worker
+      - rabbitmq
+    networks:
+      - task_management_network
+
+networks:
+  task_management_network:
+
+volumes:
+  db_data_2:
