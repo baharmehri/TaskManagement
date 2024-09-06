@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'rest_framework',
     'drf_spectacular',
-    'apps.user'
+    'apps.user',
+    'apps.task'
 ]
 
 MIDDLEWARE = [
