@@ -25,12 +25,12 @@ class OTPAuthStrategy(AuthStrategy):
             pass_code = int(pass_code)
         except ValueError:
             raise InvalidPassCode()
-        code = cache.get(user.email)
+        code = cache.get(user.pk)
         if not code:
             raise InvalidPassCode()
         if code != pass_code:
             return False
-        cache.delete(user.email)
+        cache.delete(user.pk)
         return True
 
 
@@ -55,20 +55,6 @@ class UserService:
         if not user:
             raise NotFound("User not found")
         return user
-
-    @staticmethod
-    def _check_otp(recipient, otp) -> bool:
-        code = cache.get(recipient)
-        if not code:
-            raise InvalidPassCode()
-        if code != otp:
-            return False
-        cache.delete(recipient)
-        return True
-
-    @staticmethod
-    def _check_password(user: User, password) -> bool:
-        return check_password(password=password, encoded=user.password)
 
     @staticmethod
     def register_user(validated_data: dict) -> User:
@@ -97,7 +83,6 @@ class UserService:
             return login_type
 
         login_type.update({"type": "otp"})
-        send_otp.delay(user.email)
         return login_type
 
     @staticmethod
@@ -119,3 +104,9 @@ class UserService:
 
         tokens = self._get_tokens(user)
         return tokens
+
+    @staticmethod
+    def otp_sender(validated_data):
+        user = validated_data["username"]
+        recipient = validated_data["recipient"]
+        send_otp.delay(user, recipient)

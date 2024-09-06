@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from apps.core.exceptions import DuplicatedError, InvalidPassCode
 from apps.core.response import CustomResponse as response
 from apps.user.serializers import UserRegistrationInputSerializer, UserOutputSerializer, \
-    CheckLoginTypeInputSerializer, UserLoginInputSerializer, CheckLoginTypeOutputSerializer, LoginOutputSerializer
+    CheckLoginTypeInputSerializer, UserLoginInputSerializer, CheckLoginTypeOutputSerializer, LoginOutputSerializer, \
+    SendOtpInputSerializer
 from apps.user.services import UserService
 
 
@@ -68,3 +69,20 @@ class LoginView(APIView):
             return response.error_response(e.message, status.HTTP_400_BAD_REQUEST)
 
         return Response(LoginOutputSerializer(tokens).data, status=status.HTTP_200_OK)
+
+
+class SendOtpView(APIView):
+    @extend_schema(
+        request=SendOtpInputSerializer,
+        summary="Send OTP",
+        description="This endpoint allows you to send an OTP.",
+    )
+    def post(self, request):
+        data = SendOtpInputSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        try:
+            UserService.otp_sender(data.data)
+        except Exception:
+            return response.error_response("An internal error occurred.", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return response.data_response({}, "send otp successfully", status=status.HTTP_200_OK)
