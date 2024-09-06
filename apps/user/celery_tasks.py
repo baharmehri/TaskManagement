@@ -36,9 +36,8 @@ def resolve_sender(recipient) -> OTPSender:
 
 
 @shared_task
-def send_otp(recipient):
+def send_otp(user_id, recipient):
     code = random.randint(100000, 999999)
-    cache.set(recipient, code, timeout=60 * 2)
-    print(code)
+    cache.set(user_id, code, timeout=60 * 2)
     sender = resolve_sender(recipient)
     sender.send(recipient, code)
