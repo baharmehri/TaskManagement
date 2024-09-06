@@ -67,6 +67,7 @@ cp .env.example .env
 Apply the migrations to set up your database schema:
 
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
