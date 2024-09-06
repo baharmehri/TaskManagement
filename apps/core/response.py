@@ -10,3 +10,10 @@ class CustomResponse(Response):
             'meta': meta
         }
         return cls(data=response_data, status=status)
+
+    @classmethod
+    def error_response(cls, error_message, status=None):
+        response_data = {
+            'error': error_message,
+        }
+        return cls(data=response_data, status=status)
