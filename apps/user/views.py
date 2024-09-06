@@ -8,13 +8,16 @@ from rest_framework.response import Response
 from apps.core.exceptions import DuplicatedError, InvalidPassCode
 from apps.core.response import CustomResponse as response
 from apps.user.serializers import UserRegistrationInputSerializer, UserOutputSerializer, \
-    CheckLoginTypeInputSerializer, UserLoginInputSerializer
+    CheckLoginTypeInputSerializer, UserLoginInputSerializer, CheckLoginTypeOutputSerializer, LoginOutputSerializer
 from apps.user.services import UserService
 
 
 class RegisterView(APIView):
     @extend_schema(
-        request=UserRegistrationInputSerializer
+        request=UserRegistrationInputSerializer,
+        summary="Register a new user",
+        description="This endpoint allows you to register a new user.",
+        responses=UserOutputSerializer
     )
     def post(self, request):
         data = UserRegistrationInputSerializer(data=request.data)
@@ -30,7 +33,10 @@ class RegisterView(APIView):
 
 class CheckLoginTypeView(APIView):
     @extend_schema(
-        request=CheckLoginTypeInputSerializer
+        request=CheckLoginTypeInputSerializer,
+        summary="Check the login type",
+        description="This endpoint allows you to check the login type.",
+        responses=CheckLoginTypeOutputSerializer
     )
     def post(self, request):
         data = CheckLoginTypeInputSerializer(data=request.data)
@@ -40,12 +46,16 @@ class CheckLoginTypeView(APIView):
         except NotFound as e:
             return response.error_response(str(e), status.HTTP_400_BAD_REQUEST)
 
-        return response.data_response(data=result, message="check login type successfully", status=status.HTTP_200_OK)
+        return response.data_response(data=CheckLoginTypeOutputSerializer(result).data,
+                                      message="check login type successfully", status=status.HTTP_200_OK)
 
 
 class LoginView(APIView):
     @extend_schema(
-        request=UserLoginInputSerializer
+        request=UserLoginInputSerializer,
+        summary="Login a user",
+        description="This endpoint allows you to login a user.",
+        responses=LoginOutputSerializer
     )
     def post(self, request):
         data = UserLoginInputSerializer(data=request.data)
@@ -57,4 +67,4 @@ class LoginView(APIView):
         except InvalidPassCode as e:
             return response.error_response(e.message, status.HTTP_400_BAD_REQUEST)
 
-        return Response(tokens, status=status.HTTP_200_OK)
+        return Response(LoginOutputSerializer(tokens).data, status=status.HTTP_200_OK)

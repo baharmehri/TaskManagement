@@ -14,7 +14,10 @@ class TaskView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
-        request=TaskCreateInputSerializer
+        request=TaskCreateInputSerializer,
+        summary="Create a task",
+        description="This endpoint creates a new task.",
+        responses=TaskOutputSerializer
     )
     def post(self, request):
         data = TaskCreateInputSerializer(data=request.data)
@@ -27,6 +30,11 @@ class TaskView(APIView):
         return response.data_response(TaskOutputSerializer(task).data, "Task created successfully.",
                                       status.HTTP_201_CREATED)
 
+    @extend_schema(
+        summary="Get list of tasks",
+        description="This endpoint lists all tasks.",
+        responses=TaskOutputSerializer(many=True)
+    )
     def get(self, request):
         try:
             tasks = TaskService().get_all_tasks()
@@ -40,6 +48,11 @@ class TaskView(APIView):
 class TaskUpdateView(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @extend_schema(
+        summary="Get a task.",
+        description="This endpoint get a task.",
+        responses=TaskOutputSerializer
+    )
     def get(self, request, pk):
         try:
             task = TaskService.get_task_by_id(pk)
@@ -50,7 +63,11 @@ class TaskUpdateView(APIView):
                                       status=status.HTTP_200_OK)
 
     @extend_schema(
-        request=TaskUpdateInputSerializer
+        request=TaskUpdateInputSerializer,
+        summary="Update a task.",
+        description="This endpoint update a task.",
+        responses=TaskOutputSerializer
+
     )
     def put(self, request, pk):
         data = TaskUpdateInputSerializer(data=request.data)
@@ -63,6 +80,11 @@ class TaskUpdateView(APIView):
         return response.data_response(TaskOutputSerializer(task).data, "Task updated successfully.",
                                       status=status.HTTP_200_OK)
 
+    @extend_schema(
+        summary="Delete a task.",
+        description="This endpoint delete a task.",
+        responses={200: {"description": "Task deleted successfully."}},
+    )
     def delete(self, request, pk):
         try:
             TaskService().delete_task(pk)
