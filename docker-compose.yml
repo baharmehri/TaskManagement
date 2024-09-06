@@ -42,7 +42,7 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - db_data_2:/data
+      - db_data_1:/data
     command: redis-server --appendonly yes
     env_file:
       - .env
@@ -73,7 +73,7 @@ services:
     container_name: celery-worker
     restart: always
     volumes:
-      - db_data_2:/celery/worker
+      - db_data_1:/celery/worker
     env_file:
       - .env
     depends_on:
@@ -90,7 +90,7 @@ services:
     container_name: celery-beat
     restart: always
     volumes:
-      - db_data_2:/celery/beat
+      - db_data_1:/celery/beat
     env_file:
       - .env
     depends_on:
@@ -107,7 +107,7 @@ services:
     container_name: flower
     restart: always
     volumes:
-      - db_data_2:/flower
+      - db_data_1:/flower
     ports:
       - '5555:5555'
     env_file:
@@ -122,4 +122,5 @@ networks:
   task_management_network:
 
 volumes:
+  db_data_1:
   db_data_2:

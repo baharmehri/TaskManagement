@@ -1,37 +1,80 @@
-# BaseDjango
-This project provides a foundational application with user authentication and PostgreSQL integration. Currently under development, it offers a Docker Compose setup for easy local testing.
+# Task Management
 
-# Features
-- **Secure User Authentication:** Implements JWT based authentication for robust access control.
-- **Comprehensive User Management:** Provides CRUD (Create, Read, Update, Delete) functionalities for managing user data.
-- **Interactive API Documentation:** Offers clear and interactive API documentation using Swagger, simplifying integration for developers.
-- **Enhanced Login Security:** Enables secure login via email using one-time passwords (OTP) stored on Redis for added protection.
-- **PostgreSQL Database Integration:** Leverages PostgreSQL for reliable and scalable data storage and management.
-- **Automated Testing:** Includes integration test cases to ensure code quality and application functionality.
+This project provides a simple user authentication system with registration, login via password or OTP, and basic task
+management functionality. Users can create, read, update, and delete tasks through a straightforward CRUD interface.
+Ideal for learning the fundamentals of user authentication and task management.
 
-# Instructions
-To run the application using Docker Compose, follow these steps:
+## Table of Contents
 
-1.Clone the repository to your local machine:
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Database Migrations](#database-migrations)
+- [Deployment](#deployment)
 
-`git clone <repository-url>`
+## Features
 
-2.Navigate to the project directory:
+- **Password and OTP Login:** Supports secure user authentication through both password and One-Time Password (OTP)
+  methods.
+- **Asynchronous OTP Handling:** Uses Celery for the asynchronous generation and sending of OTPs, ensuring efficient and
+  reliable delivery.
+- **OTP Queue Management:** Utilizes RabbitMQ for queuing and distributing OTPs, enabling scalable and resilient OTP
+  processing.
+- **OTP Caching:** Employs Redis to cache OTPs, optimizing verification speed and reducing redundant OTP generation.
 
-`cd base_django`
+## Prerequisites
 
-3.Build and run the Docker containers using Docker Compose:
+Before you begin, ensure you have met the following requirements:
 
-`docker compose up`
+- **Python 3.10+** installed on your machine.
+- **Virtualenv** or another method for managing virtual environments.
+- **Docker** and **Docker Compose**.
 
-After successfully launching the containers with Docker Compose, you can access the application in your web browser at `http://localhost:8000`.
+## Installation
 
-# Technologies Used
-- Python
-- Django
-- PostgreSQL
-- Redis
-- Swagger
-- Docker
-- Docker Compose
-- REST framework for API development
+### 1. Clone the Repository
+
+```bash
+git clonehttps://github.com/baharmehri/TaskManagement.git
+cd TaskManagement
+```
+
+### 2. Create and Activate a Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements/requirements.txt
+```
+
+## Environment Variables
+
+Create a .env file in the project root directory and add the required environment.
+You can copy the .env.example file:
+
+```bash
+cp .env.example .env
+```
+
+## Database Migrations
+
+Apply the migrations to set up your database schema:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+## Deployment
+
+To deploy the Notification Service using Docker Compose, run this:
+
+```bash
+docker compose up --build -d
+```
