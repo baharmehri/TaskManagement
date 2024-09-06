@@ -97,8 +97,7 @@ class UserService:
             return login_type
 
         login_type.update({"type": "otp"})
-        # send_otp.delay(user.email)
-        send_otp(user.email)
+        send_otp.delay(user.email)
         return login_type
 
     @staticmethod
