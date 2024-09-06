@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
 from apps.core.exceptions import DuplicatedError, InvalidPassCode
 from apps.core.response import CustomResponse as response
@@ -56,4 +57,4 @@ class LoginView(APIView):
         except InvalidPassCode as e:
             return response.error_response(e.message, status.HTTP_400_BAD_REQUEST)
 
-        return response.data_response(data=tokens, message="login successfully", status=status.HTTP_200_OK)
+        return Response(tokens, status=status.HTTP_200_OK)
