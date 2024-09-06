@@ -23,3 +23,13 @@ class UserOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'username')
+
+
+class CheckLoginTypeOutputSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    type = serializers.ChoiceField(choices=(('password', 'password'), ('otp', 'otp')))
+
+
+class LoginOutputSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    access = serializers.CharField()
