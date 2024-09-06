@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
+    'django_celery_beat',
     'rest_framework',
     'drf_spectacular',
     'apps.user'
@@ -80,12 +82,19 @@ AUTH_USER_MODEL = 'user.User'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{os.environ.get("REDIS_HOST")}:{os.environ.get("REDIS_PORT")}/{os.environ.get("REDIS_DB")}',
+        'LOCATION': os.environ.get('REDIS_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = os.environ.get("RABBITMQ_URL")
+
+# Rabbitmq
+BROKER_URL = os.environ.get("RABBITMQ_URL")
 
 DATABASES = {
     'default': {
