@@ -107,6 +107,6 @@ class UserService:
 
     @staticmethod
     def otp_sender(validated_data):
-        user = validated_data["username"]
+        user = validated_data["user"]
         recipient = validated_data["recipient"]
         send_otp.delay(user, recipient)
