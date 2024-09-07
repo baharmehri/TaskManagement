@@ -24,7 +24,7 @@ class UserLoginInputSerializer(serializers.Serializer):
 class SendOtpInputSerializer(serializers.Serializer):
     recipient = serializers.CharField(required=True)
     type = serializers.ChoiceField(choices=(('email', 'email'), ('sms', 'sms')))
-    username = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     def validate(self, data):
         if data['type'] == 'email':
